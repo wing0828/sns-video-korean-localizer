@@ -10,4 +10,6 @@
 .download{min-width:280px}
 .local-launch{display:inline-flex;margin-top:4px}
 .final-cta>p{font-size:12px;color:#7e817b;margin:20px 0 0}
+.inline-link{color:var(--lime);text-decoration:underline;text-underline-offset:3px}
+.inline-link:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 @media(max-width:520px){.download{min-width:0}}

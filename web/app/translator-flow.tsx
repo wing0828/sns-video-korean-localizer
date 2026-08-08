@@ -1,20 +1,21 @@
 const localhostUrl = "http://127.0.0.1:7860";
-const downloadUrl = "/downloads/sns-video-korean-localizer-windows.zip";
+const downloadUrl = "https://github.com/wing0828/sns-video-korean-localizer/releases/download/v0.1.0/sns-video-korean-localizer-windows.zip";
+const githubUrl = "https://github.com/wing0828/sns-video-korean-localizer";
 
 export function TranslatorFlow() {
   return (
     <main>
       <nav className="nav" aria-label="주요 메뉴">
         <a className="brand" href="#top" aria-label="말옮김 홈"><span>말</span>옮김</a>
-        <div className="nav-right"><span className="status"><i aria-hidden="true" /> Windows · 로컬 처리</span><a className="quiet-link" href="#install">설치 방법</a><a className="nav-cta" href={downloadUrl} download>스킬 다운로드 ↓</a></div>
+        <div className="nav-right"><span className="status"><i aria-hidden="true" /> Windows · 로컬 처리</span><a className="quiet-link" href={githubUrl} target="_blank" rel="noreferrer">GitHub에서 소스 보기 ↗</a><a className="nav-cta" href={downloadUrl}>스킬 다운로드 ↓</a></div>
       </nav>
 
       <section className="hero" id="top">
         <div className="eyebrow"><span>WINDOWS · LOCAL FIRST</span><em>SNS 영상 번역을 내 컴퓨터에서</em></div>
         <h1>주소만 붙여넣으면,<br/><strong>한국어 영상이 됩니다.</strong></h1>
         <p className="lede">Windows용 스킬을 한 번 설치하고 SNS 영상 URL을 입력하세요.<br className="desktop"/> 한국어 자막과 음성 더빙을 내 컴퓨터에서 완성합니다.</p>
-        <div className="hero-actions"><a className="primary download" href={downloadUrl} download>Windows 스킬 다운로드 <span aria-hidden="true">↓</span></a><a className="secondary" href="#install">3단계 설치 보기</a></div>
-        <p className="microcopy">ZIP 파일 · Windows 전용 · 영상 파일 업로드 없이 공개 SNS URL로 사용</p>
+        <div className="hero-actions"><a className="primary download" href={downloadUrl}>Windows 스킬 다운로드 <span aria-hidden="true">↓</span></a><a className="secondary" href={githubUrl} target="_blank" rel="noreferrer">GitHub에서 소스 보기 ↗</a></div>
+        <p className="microcopy">ZIP 파일 · Windows 전용 · 영상 파일 업로드 없이 공개 SNS URL로 사용 · <a className="inline-link" href="#install">3단계 설치 보기</a></p>
       </section>
 
       <section className="promise" aria-label="개인정보 보호 방식">
@@ -27,7 +28,7 @@ export function TranslatorFlow() {
           <li><span>1</span><div><b>ZIP 다운로드</b><p><code>sns-video-korean-localizer-windows.zip</code>을 내려받으세요.</p></div></li>
           <li><span>2</span><div><b>스킬 폴더에 압축 풀기</b><p>압축을 풀어 <code>%USERPROFILE%\.codex\skills\sns-video-korean-localizer</code> 폴더가 되게 하세요.</p></div></li>
           <li><span>3</span><div><b>설치 후 실행</b><p>압축을 푼 폴더에서 <code>setup.ps1</code>을 한 번 실행하고, 이후 <code>run.ps1</code>을 실행하세요.</p></div></li>
-        </ol><a className="primary download" href={downloadUrl} download>스킬 ZIP 다운로드 <span aria-hidden="true">↓</span></a><p className="launch-note">PowerShell이 실행을 막으면 안내 문서를 확인하세요. AI 모델은 첫 작업 때 내려받습니다.</p></div>
+        </ol><a className="primary download" href={downloadUrl}>스킬 ZIP 다운로드 <span aria-hidden="true">↓</span></a><p className="launch-note">PowerShell이 실행을 막으면 안내 문서를 확인하세요. AI 모델은 첫 작업 때 내려받습니다.</p></div>
       </section>
 
       <section className="guide" id="guide">

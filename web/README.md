@@ -8,8 +8,4 @@ npm run dev
 npm run build
 ```
 
-Vercel에서 저장소를 연결할 때 **Root Directory**를 `web`으로 지정합니다. 다운로드 파일은 다음 경로에 있어야 합니다.
-
-`public/downloads/sns-video-korean-localizer-windows.zip`
-
-사이트의 다운로드 링크는 `/downloads/sns-video-korean-localizer-windows.zip`을 사용합니다.
+Vercel에서 저장소를 연결할 때 **Root Directory**를 `web`으로 지정합니다. 다운로드 CTA는 GitHub Release `v0.1.0`의 `sns-video-korean-localizer-windows.zip` 자산을 사용하고, 소스 링크는 공개 GitHub 저장소로 연결됩니다.
