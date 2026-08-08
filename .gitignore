@@ -1,0 +1,45 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+outputs/
+models/
+.env
+.env.*
+
+# Secrets, credentials, certificates, and local sessions
+*credential*
+*credentials*
+*secret*
+*secrets*
+sessions/
+*.key
+*.jks
+service-account*.json
+.Codex/
+*.mp4
+*.wav
+*.mp3
+*.srt
+*.pt
+*.onnx
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# Build maps and temporary/downloaded media
+*.map
+temp/
+tmp/
+*.tmp
+*.temp
+*.part
+*.ytdl
+source.*
+dub-*.mp3
+dubbed-audio.wav
+
+# Public release artifact
+!web/public/downloads/sns-video-korean-localizer-windows.zip

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SNS Video Korean Localizer"
+  short_description: "Create Korean subtitles and dubbing for SNS videos locally"
+  default_prompt: "Use $sns-video-korean-localizer to process an authorized SNS video URL into Korean subtitles or dubbing locally."
