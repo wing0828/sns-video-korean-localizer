@@ -1,0 +1,16 @@
+services:
+  subtitle-app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:7860:7860"
+    volumes:
+      - whisper-models:/data/models
+      - subtitle-outputs:/app/outputs
+    mem_limit: 3g
+    cpus: 2.0
+
+volumes:
+  whisper-models:
+  subtitle-outputs:

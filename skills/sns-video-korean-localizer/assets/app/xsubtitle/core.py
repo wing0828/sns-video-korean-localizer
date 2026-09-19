@@ -65,6 +65,14 @@ KOREAN_VOICES = {
     "male": "ko-KR-InJoonNeural",
 }
 
+# Mobile-first subtitle styling. ASS colors use AABBGGRR ordering.
+SUBTITLE_FORCE_STYLE = (
+    "FontName=Noto Sans CJK KR,FontSize=12,Bold=-1,"
+    "PrimaryColour=&H00151515,OutlineColour=&H004DD8FF,"
+    "BackColour=&H004DD8FF,BorderStyle=3,Outline=4,Shadow=0,"
+    "Alignment=2,MarginL=24,MarginR=24,MarginV=20"
+)
+
 
 def _winget_media_pairs() -> list[tuple[tuple[int, ...], Path, Path]]:
     local_app_data = os.environ.get("LOCALAPPDATA")
@@ -395,7 +403,8 @@ def get_argos_translator() -> Callable[[str], str]:
 def ffmpeg_burn_command(video: Path, subtitles: Path, output: Path) -> list[str]:
     subtitle_filter_path = str(subtitles.resolve()).replace("\\", "/").replace(":", r"\:").replace("'", r"\'")
     return [
-        str(resolve_media_executable("ffmpeg")), "-y", "-i", str(video), "-vf", f"subtitles='{subtitle_filter_path}'",
+        str(resolve_media_executable("ffmpeg")), "-y", "-i", str(video), "-vf",
+        f"subtitles='{subtitle_filter_path}':force_style='{SUBTITLE_FORCE_STYLE}'",
         "-c:a", "copy", str(output),
     ]
 

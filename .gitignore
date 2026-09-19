@@ -6,6 +6,7 @@ outputs/
 models/
 .env
 .env.*
+!.env.example
 
 # Secrets, credentials, certificates, and local sessions
 *credential*
