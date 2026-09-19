@@ -18,10 +18,10 @@ MAX_UPLOAD_BYTES = 500 * 1024 * 1024
 
 # ASS colors use AABBGGRR ordering. The yellow box is intentionally opaque.
 SUBTITLE_FORCE_STYLE = (
-    "FontName=Noto Sans CJK KR,FontSize=12,Bold=-1,"
+    "FontName=Noto Sans CJK KR,FontSize=20,Bold=-1,"
     "PrimaryColour=&H00151515,OutlineColour=&H004DD8FF,"
     "BackColour=&H004DD8FF,BorderStyle=3,Outline=4,Shadow=0,"
-    "Alignment=2,MarginL=24,MarginR=24,MarginV=20"
+    "Alignment=2,MarginL=24,MarginR=24,MarginV=26"
 )
 
 

@@ -67,10 +67,10 @@ KOREAN_VOICES = {
 
 # Mobile-first subtitle styling. ASS colors use AABBGGRR ordering.
 SUBTITLE_FORCE_STYLE = (
-    "FontName=Noto Sans CJK KR,FontSize=12,Bold=-1,"
+    "FontName=Noto Sans CJK KR,FontSize=20,Bold=-1,"
     "PrimaryColour=&H00151515,OutlineColour=&H004DD8FF,"
     "BackColour=&H004DD8FF,BorderStyle=3,Outline=4,Shadow=0,"
-    "Alignment=2,MarginL=24,MarginR=24,MarginV=20"
+    "Alignment=2,MarginL=24,MarginR=24,MarginV=26"
 )
 
 

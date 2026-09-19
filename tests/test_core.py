@@ -74,6 +74,7 @@ class CoreTests(unittest.TestCase):
         self.assertIn("BorderStyle=3", video_filter)
         self.assertIn("PrimaryColour=&H00151515", video_filter)
         self.assertIn("OutlineColour=&H004DD8FF", video_filter)
+        self.assertIn("FontSize=20", video_filter)
         self.assertIn("libx264", command)
         self.assertIn("veryfast", command)
         self.assertIn("+faststart", command)
