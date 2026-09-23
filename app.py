@@ -22,7 +22,7 @@ def run_job(uploaded_path: str | None, video_url: str, model_name: str, progress
             downloaded_path.unlink(missing_ok=True)
             try: downloaded_path.parent.rmdir()
             except OSError: pass
-    return (f"완료됐어요. 아래에서 결과를 저장하세요. (작업 번호: {result.job_id})", str(result.subtitled_video), str(result.korean_srt), str(result.source_srt))
+    return (f"완료됐어요. 아래에서 결과를 저장하세요. (작업 번호: {result.job_id})", str(result.subtitled_video), str(result.korean_srt))
 
 
 CSS = """
@@ -59,12 +59,10 @@ with gr.Blocks(title="한국어 자막 영상 만들기") as demo:
         with gr.Group(elem_classes="card"):
             status = gr.Textbox(label="진행 상태", interactive=False)
             subtitled = gr.File(label="한국어 자막 영상 · MP4")
-            with gr.Row():
-                korean = gr.File(label="한국어 자막 · SRT")
-                source = gr.File(label="영어 원문 자막 · SRT")
+            korean = gr.File(label="한국어 자막 · SRT")
         gr.Markdown("처음 실행할 때 음성 인식 모델을 내려받으므로 시간이 더 걸릴 수 있습니다.")
 
-    submit.click(run_job, [video, video_url, model], [status, subtitled, korean, source])
+    submit.click(run_job, [video, video_url, model], [status, subtitled, korean])
 
 
 if __name__ == "__main__":
