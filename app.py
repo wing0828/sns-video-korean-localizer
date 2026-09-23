@@ -48,23 +48,23 @@ with gr.Blocks(title="한국어 자막 영상 만들기") as demo:
         gr.HTML(
             """<header class="hero"><span class="badge">PRIVATE VIDEO TRANSLATOR</span>
             <h1>영상을 올리면<br>한국어 자막 영상으로</h1>
-            <p>외국어 음성을 자동으로 인식하고, Gemini가 문맥을 살려 번역·검수한 뒤 읽기 좋은 한국어 자막을 입힙니다.</p></header>"""
+            <p>영어 전용 Whisper로 원문을 인식하고 NLLB 번역 모델로 한국어 자막을 만듭니다. API 요금 없이 이 노트북에서 처리합니다.</p></header>"""
         )
         with gr.Group(elem_classes="card"):
             video = gr.File(label="영상 선택", file_types=["video"], type="filepath")
             model = gr.Radio(
-                [("균형 · 추천", "small"), ("더 빠르게", "base")],
+                [("품질 우선 · 영어 small.en · 추천", "small"), ("더 빠르게 · 영어 base.en", "base")],
                 value="small",
                 label="음성 인식",
             )
             submit = gr.Button("한국어 자막 영상 만들기", variant="primary", elem_classes="run-button")
-            gr.Markdown("영상은 이 노트북에서 처리되며, 음성에서 추출한 자막 텍스트만 Gemini로 전송됩니다.")
+            gr.Markdown("로컬 무료 모드 · 영상과 자막은 이 노트북에서 처리됩니다. Gemini API를 호출하지 않습니다.")
         with gr.Group(elem_classes="card"):
             status = gr.Textbox(label="진행 상태", interactive=False)
             subtitled = gr.File(label="한국어 자막 영상 · MP4")
             with gr.Row():
                 korean = gr.File(label="한국어 자막 · SRT")
-                source = gr.File(label="원문 자막 · SRT")
+                source = gr.File(label="영어 원문 자막 · SRT")
         gr.Markdown("처음 실행할 때 음성 인식 모델을 내려받으므로 시간이 더 걸릴 수 있습니다.")
 
     submit.click(run_job, [video, model], [status, subtitled, korean, source])

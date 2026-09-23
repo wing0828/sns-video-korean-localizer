@@ -20,6 +20,7 @@ COPY --from=builder /wheels /wheels
 RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
 COPY --chown=appuser:appuser app.py ./
 COPY --chown=appuser:appuser xsubtitle ./xsubtitle
+COPY --chown=appuser:appuser local-models/en_ko /opt/local-models/en_ko
 RUN mkdir -p /data/models /app/outputs && chown -R appuser:appuser /data /app/outputs
 
 USER appuser

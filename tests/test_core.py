@@ -101,7 +101,8 @@ class CoreTests(unittest.TestCase):
 
             with (
                 patch("xsubtitle.core.transcribe_video", return_value=source_cues),
-                patch("xsubtitle.core.translate_cues_with_gemini", return_value=korean_cues),
+                patch("xsubtitle.core.translate_cues_locally", return_value=korean_cues),
+                patch("xsubtitle.core.translate_cues_with_gemini", side_effect=AssertionError("API must not be called")),
                 patch("xsubtitle.core.burn_subtitles", side_effect=fake_burn),
             ):
                 result = process_job(

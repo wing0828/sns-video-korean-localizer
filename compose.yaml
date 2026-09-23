@@ -2,7 +2,10 @@ services:
   subtitle-app:
     build: .
     restart: unless-stopped
-    env_file: .env
+    environment:
+      WHISPER_CPU_THREADS: "2"
+      LOCAL_TRANSLATION_MODEL: /data/models/nllb-600m
+      GRADIO_ANALYTICS_ENABLED: "False"
     ports:
       - "127.0.0.1:7860:7860"
     volumes:

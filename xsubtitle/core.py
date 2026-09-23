@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import gc
 import os
 import re
 import shutil
@@ -85,15 +86,17 @@ def transcribe_video(
     except ImportError as exc:
         raise UserFacingError("faster-whisper가 설치되어 있지 않습니다.") from exc
 
+    model = None
     try:
         model = WhisperModel(
-            model_name,
+            model_name if model_name.endswith('.en') else model_name + '.en',
             device="cpu",
             compute_type="int8",
             cpu_threads=int(os.environ.get("WHISPER_CPU_THREADS", "3")),
         )
         segments, info = model.transcribe(
-            str(video_path), vad_filter=True, beam_size=3
+            str(video_path), vad_filter=True, beam_size=5, task="transcribe", language="en",
+            temperature=0.0, condition_on_previous_text=True,
         )
         duration = float(getattr(info, "duration", 0) or 0)
         cues = []
@@ -105,13 +108,70 @@ def transcribe_video(
                 _emit_progress(
                     progress_callback,
                     min(1.0, float(segment.end) / duration),
-                    "외국어 음성 인식 중",
+                    "영어 전용 모델로 원문 인식 중",
                 )
     except Exception as exc:
         raise UserFacingError(f"음성 인식에 실패했습니다: {exc}") from exc
+    finally:
+        if model is not None:
+            model.model.unload_model()
+            del model
+        gc.collect()
     if not cues:
         raise UserFacingError("영상에서 음성을 찾지 못했습니다.")
     return cues
+
+
+def translate_cues_locally(
+    cues: Sequence[SubtitleCue],
+    progress_callback: ProgressCallback | None = None,
+) -> list[SubtitleCue]:
+    """Translate English intermediate cues on CPU without any API requests."""
+    import ctranslate2
+    import sentencepiece as spm
+
+    model_dir = Path(os.environ.get("LOCAL_TRANSLATION_MODEL", "/data/models/nllb-600m"))
+    nllb = (model_dir / "sentencepiece.bpe.model").is_file()
+    weights_dir = model_dir if nllb else model_dir / "model"
+    if not (weights_dir / "model.bin").is_file():
+        raise UserFacingError("로컬 한국어 번역 모델이 없습니다. 서버 모델 설치를 확인해 주세요.")
+    tokenizer = spm.SentencePieceProcessor(model_file=str(model_dir / ("sentencepiece.bpe.model" if nllb else "sentencepiece.model")))
+    translator = ctranslate2.Translator(
+        str(weights_dir), device="cpu", compute_type="int8",
+        inter_threads=1, intra_threads=2,
+    )
+    translated = []
+    try:
+        for index, cue in enumerate(cues):
+            sentences = re.split(r'(?<=[.!?])\s+(?=[A-Z])', cue.text.strip()) if nllb else [cue.text]
+            # Whisper cues are short; split unusually long cues rather than silently truncate.
+            pieces = []
+            chunks = []
+            for sentence in sentences:
+                tokens = tokenizer.encode(sentence, out_type=str)
+                chunks.extend(tokens[start:start + 160] for start in range(0, len(tokens), 160))
+            for source_tokens in chunks:
+                options = {}
+                if nllb:
+                    source_tokens = ["eng_Latn"] + source_tokens + ["</s>"]
+                    options["target_prefix"] = [["kor_Hang"]]
+                result = translator.translate_batch(
+                    [source_tokens], beam_size=4,
+                    max_input_length=0, max_decoding_length=512,
+                    **options,
+                )[0]
+                output_tokens = [t for t in result.hypotheses[0] if t not in {"kor_Hang", "</s>", "<s>"}]
+                pieces.append(tokenizer.decode(output_tokens))
+            text = " ".join(pieces).strip()
+            if not text:
+                raise UserFacingError("로컬 번역 결과가 비어 있습니다.")
+            translated.append(SubtitleCue(cue.start, cue.end, text))
+            _emit_progress(progress_callback, (index + 1) / max(1, len(cues)), "로컬 한국어 번역 중 · API 사용 없음")
+    finally:
+        translator.unload_model()
+        del translator
+        gc.collect()
+    return translated
 
 
 def translate_cues_with_gemini(
@@ -287,7 +347,7 @@ def process_job(
         video = job_dir / f"source{source.suffix.lower()}"
         shutil.copy2(source, video)
         cues = transcribe_video(video, model_name, stage(0.05, 0.60))
-        korean_cues = translate_cues_with_gemini(cues, stage(0.62, 0.82))
+        korean_cues = translate_cues_locally(cues, stage(0.62, 0.82))
         source_srt = job_dir / "subtitles.source.srt"
         korean_srt = job_dir / "subtitles.ko.srt"
         source_srt.write_text(render_srt(cues), encoding="utf-8")
