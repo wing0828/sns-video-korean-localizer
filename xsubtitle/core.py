@@ -313,6 +313,31 @@ def burn_subtitles(video: Path, subtitles: Path, output: Path) -> None:
         raise UserFacingError(f"자막 입히기에 실패했습니다: {detail}") from exc
 
 
+def download_social_video(url: str, progress_callback: ProgressCallback | None = None) -> Path:
+    """Download one public X/Twitter video into a temporary directory."""
+    from urllib.parse import urlparse
+    try: parsed = urlparse(url)
+    except ValueError as exc: raise UserFacingError("올바른 게시물 링크가 아닙니다.") from exc
+    host = (parsed.hostname or "").lower().removeprefix("www.")
+    if host not in {"x.com", "twitter.com", "mobile.twitter.com", "mobile.x.com"} or "/status/" not in parsed.path:
+        raise UserFacingError("X.com 또는 Twitter.com 영상 게시물 링크만 지원합니다.")
+    try:
+        import tempfile, yt_dlp
+    except ImportError as exc: raise UserFacingError("yt-dlp가 설치되어 있지 않습니다.") from exc
+    target = Path(tempfile.mkdtemp(prefix="sns-video-")); _emit_progress(progress_callback, 0.02, "X/Twitter 영상 내려받는 중")
+    options = {"outtmpl": str(target / "source.%(ext)s"), "format": "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b", "merge_output_format": "mp4", "noplaylist": True, "max_filesize": MAX_UPLOAD_BYTES, "quiet": True, "no_warnings": True, "restrictfilenames": True}
+    try:
+        with yt_dlp.YoutubeDL(options) as ydl:
+            info = ydl.extract_info(url, download=True)
+            if info.get("_type") == "playlist": raise UserFacingError("게시물 하나의 영상만 지원합니다.")
+        candidates = sorted(target.glob("source.*"))
+        if not candidates: raise UserFacingError("게시물에서 영상을 찾지 못했습니다.")
+        video = candidates[0]
+        if video.stat().st_size > MAX_UPLOAD_BYTES: raise UserFacingError("다운로드한 영상이 500MB를 초과합니다.")
+        _emit_progress(progress_callback, 0.05, "영상 다운로드 완료"); return video
+    except UserFacingError: shutil.rmtree(target, ignore_errors=True); raise
+    except Exception as exc: shutil.rmtree(target, ignore_errors=True); raise UserFacingError(f"X/Twitter 영상 다운로드에 실패했습니다: {exc}") from exc
+
 def process_job(
     uploaded_path: str | Path,
     model_name: str = "small",
