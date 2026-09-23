@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import shutil
+import uuid
 from pathlib import Path
 
 import gradio as gr
@@ -8,12 +10,23 @@ import gradio as gr
 from xsubtitle.core import UserFacingError, download_social_video, process_job
 
 
-def run_job(uploaded_path: str | None, video_url: str, model_name: str, progress=gr.Progress()):
+def run_job(uploaded_path: str | None, video_url: str, download_only: bool, model_name: str, progress=gr.Progress()):
     downloaded_path = None; source_path = uploaded_path
     if video_url and video_url.strip():
         try: downloaded_path = download_social_video(video_url.strip(), lambda value, description: progress(value, desc=description)); source_path = str(downloaded_path)
         except UserFacingError as exc: raise gr.Error(str(exc)) from exc
     if not source_path: raise gr.Error("영상을 업로드하거나 X/Twitter 게시물 링크를 입력해 주세요.")
+    if download_only:
+        if downloaded_path is None:
+            raise gr.Error("다운로드 전용은 X/Twitter 링크를 입력했을 때만 사용할 수 있습니다.")
+        saved_dir = Path("outputs") / "downloads" / str(uuid.uuid4())
+        saved_dir.mkdir(parents=True, exist_ok=True)
+        saved_video = saved_dir / "downloaded.mp4"
+        shutil.copy2(downloaded_path, saved_video)
+        downloaded_path.unlink(missing_ok=True)
+        try: downloaded_path.parent.rmdir()
+        except OSError: pass
+        return ("다운로드가 완료됐어요.", str(saved_video), None)
     try:
         result = process_job(source_path, model_name, progress_callback=lambda value, description: progress(value, desc=f"{description} · {value:.0%}"))
     except UserFacingError as exc: raise gr.Error(str(exc)) from exc
@@ -49,6 +62,7 @@ with gr.Blocks(title="한국어 자막 영상 만들기") as demo:
         with gr.Group(elem_classes="card"):
             video = gr.File(label="영상 선택", file_types=["video"], type="filepath")
             video_url = gr.Textbox(label="X/Twitter 게시물 링크 (선택)", placeholder="https://x.com/.../status/...", info="영상이 포함된 공개 게시물만 지원합니다.")
+            download_only = gr.Checkbox(label="번역 없이 영상만 다운로드", value=False)
             model = gr.Radio(
                 [("품질 우선 · 영어 small.en · 추천", "small"), ("더 빠르게 · 영어 base.en", "base")],
                 value="small",
@@ -62,7 +76,7 @@ with gr.Blocks(title="한국어 자막 영상 만들기") as demo:
             korean = gr.File(label="한국어 자막 · SRT")
         gr.Markdown("처음 실행할 때 음성 인식 모델을 내려받으므로 시간이 더 걸릴 수 있습니다.")
 
-    submit.click(run_job, [video, video_url, model], [status, subtitled, korean])
+    submit.click(run_job, [video, video_url, download_only, model], [status, subtitled, korean])
 
 
 if __name__ == "__main__":
