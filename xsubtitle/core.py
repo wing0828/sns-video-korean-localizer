@@ -15,7 +15,7 @@ from typing import Callable, Iterable, Sequence
 
 ProgressCallback = Callable[[float, str], None]
 SUPPORTED_VIDEO_SUFFIXES = {".mp4", ".mov", ".mkv", ".webm", ".avi", ".m4v"}
-MAX_UPLOAD_BYTES = 500 * 1024 * 1024
+MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024
 
 # ASS colors use AABBGGRR ordering. The yellow box is intentionally opaque.
 SUBTITLE_FORCE_STYLE = (

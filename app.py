@@ -86,5 +86,5 @@ if __name__ == "__main__":
         server_port=int(os.environ.get("PORT", "7860")),
         share=False,
         css=CSS,
-        max_file_size="500mb",
+        max_file_size="2gb",
     )
